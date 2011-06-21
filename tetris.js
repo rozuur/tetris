@@ -70,7 +70,7 @@ function rotateTetra(tetra){
 }
 
 function canMoveRight(tetra){
-    if(tetra.stopped){ 
+    if (tetra.stopped) { 
         return false;
     }
     var dim = tetra.size;
@@ -187,13 +187,69 @@ function animateTetra(tetra){
     }
     else{
         tetra.stopped = true;
-        var rand = getRandomInt(0,7);
+        clearFilledLines(tetra);
+        var rand = getRandomInt(6,6);
         initialtetra = 
             new Tetra(tetras[rand]);
         clearInterval(timerId);
-        timerId = setInterval(animateTetra,100, initialtetra);
-    }   
+        timerId = setInterval(animateTetra,200, initialtetra);
+    }
 }
+
+Array.prototype.sum = function () {
+    if (this.length == 0) { return 0; }
+    var result = 0;
+    for (var i = 0; i < this.length; i++) {
+        result = result + this[i];
+    }
+    return result;
+};
+
+function clearFilledLines(tetra) {
+    var posY = tetra.posY;
+    var nRows = tetra.size;
+    var clearLine = true;
+    for (var y = posY, r = 0; r < nRows; r++, y += cellSize) {
+        if (tetra.desc[r].sum() == 0) {
+            continue;
+        }
+
+        for (var x = 0; x < canvas.width; x += cellSize) {
+            var imgd = context.getImageData(x, y, dsize, dsize);
+            var pix;
+            if (imgd) {
+                pix = imgd.data;
+                for (var i = 0, n = pix.length; i < n; i += 4) {
+                    if (!(pix[i] + pix[i + 1] + pix[i + 2] + pix[i + 3])) {
+                        clearLine = false;
+                        break;
+                    }
+                }
+            }
+            if (!clearLine) {
+                break;
+            }
+        }
+
+        if (clearLine) {
+            var imgd = context.getImageData(0, 0, canvas.width, y);
+            var imgData = imgd.data;
+            alert("cleared lines " + imgData.length);
+            alert(imgData[0]);
+            for (var i = 0; i < imgData.length; i+=4) {
+                imgData[i] = 100;
+                imgData[i+1] = 100;
+                imgData[i+2] = 100;
+                imgData[i+3] = 100;
+            }
+            alert(imgData[0]);
+            imgd.data = imgData;
+            context.putImageData(imgd, 0, 0);
+        }
+    }
+
+}
+
 
 var tetras = [
     [
@@ -266,4 +322,6 @@ var initialtetra = new Tetra([
 var timerId = setInterval(animateTetra,100, initialtetra);
 
 context.fillStyle = "rgb(0,0,0)";
-context.fillRect(0,canvas.height - 20 * cellSize, canvas.width, cellSize);
+context.fillRect(0, canvas.height - 20 * cellSize, canvas.width, cellSize);
+context.fillRect(0, canvas.height - 21 * cellSize, canvas.width, cellSize);
+context.clearRect(canvas.width / 2, canvas.height - 21 * cellSize, cellSize * 4, cellSize);
