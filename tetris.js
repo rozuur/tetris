@@ -196,60 +196,56 @@ function animateTetra(tetra){
     }
 }
 
-Array.prototype.sum = function () {
-    if (this.length == 0) { return 0; }
+function sum(array) {
+    if (array.length == 0) { return 0; }
     var result = 0;
-    for (var i = 0; i < this.length; i++) {
-        result = result + this[i];
+    for (var i = 0; i < array.length; i++) {
+        result = result + array[i];
     }
     return result;
 };
 
+function isBackGround(x,y){
+    var image = context.getImageData(x + dsize,y + dsize,dsize,dsize);
+    var pix = image.data;
+    for(var i = 0; i < pix.length; i+=4){
+        if(pix[i] + pix[i + 1] + pix[i + 2] + pix[i + 3]){
+            return false;
+        }
+    }
+    return true;
+}
+
 function clearFilledLines(tetra) {
     var posY = tetra.posY;
     var nRows = tetra.size;
-    var clearLine = true;
     for (var y = posY, r = 0; r < nRows; r++, y += cellSize) {
-        if (tetra.desc[r].sum() == 0) {
+        if (sum(tetra.desc[r]) == 0) {
             continue;
         }
-
+        //alert("some tetra has ones");
+        var clearLine = true;
         for (var x = 0; x < canvas.width; x += cellSize) {
-            var imgd = context.getImageData(x, y, dsize, dsize);
-            var pix;
-            if (imgd) {
-                pix = imgd.data;
-                for (var i = 0, n = pix.length; i < n; i += 4) {
-                    if (!(pix[i] + pix[i + 1] + pix[i + 2] + pix[i + 3])) {
-                        clearLine = false;
+            if(isBackGround(x,y)){ 
+                //alert("clear lined failed at " + x + " and " + y);
+                clearLine = false;
+                break; // some white box is there in line
+            }
+        }
+        
+        //alert("clear line is "+clearLine);
+        if (clearLine) {
+            for(var x = 0; x < canvas.width; x += cellSize){
+                for(var _r = y - cellSize; _r >= 0; _r-=cellSize){
+                    if(isBackGround(x,_r)){
+                        context.clearRect(x,_r + cellSize, cellSize, cellSize);
                         break;
                     }
                 }
             }
-            if (!clearLine) {
-                break;
-            }
-        }
-
-        if (clearLine) {
-            var imgd = context.getImageData(0, 0, canvas.width, y);
-            var imgData = imgd.data;
-            alert("cleared lines " + imgData.length);
-            alert(imgData[0]);
-            for (var i = 0; i < imgData.length; i+=4) {
-                imgData[i] = 100;
-                imgData[i+1] = 100;
-                imgData[i+2] = 100;
-                imgData[i+3] = 100;
-            }
-            alert(imgData[0]);
-            imgd.data = imgData;
-            context.putImageData(imgd, 0, 0);
         }
     }
-
 }
-
 
 var tetras = [
     [
@@ -311,7 +307,6 @@ function handleArrowKeys(evt) {
 
 document.onkeyup = handleArrowKeys;
 
-
 var initialtetra = new Tetra([
                                  [0,0,0,0],
                                  [1,1,1,1],
@@ -319,9 +314,11 @@ var initialtetra = new Tetra([
                                  [0,0,0,0]
                              ]);
 
-var timerId = setInterval(animateTetra,100, initialtetra);
+var timerId = setInterval(animateTetra,200, initialtetra);
 
 context.fillStyle = "rgb(0,0,0)";
 context.fillRect(0, canvas.height - 20 * cellSize, canvas.width, cellSize);
 context.fillRect(0, canvas.height - 21 * cellSize, canvas.width, cellSize);
+context.fillRect(0, canvas.height - 22 * cellSize, canvas.width, cellSize);
 context.clearRect(canvas.width / 2, canvas.height - 21 * cellSize, cellSize * 4, cellSize);
+context.clearRect((canvas.width / 2) - 10 * cellSize , canvas.height - 22 * cellSize, cellSize * 4, cellSize);
