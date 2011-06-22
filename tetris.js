@@ -67,7 +67,22 @@ function canRotate(tetra){
             break;
         }
     }
-    return (tetra.posX + r * cellSize < canvas.width);
+    var rightX = (tetra.posX + r * cellSize < canvas.width);
+
+    for(var r = 0, breaked = false; r < tetra.size; ++r){
+        for(var c = 0; c < tetra.size; ++c){
+            if(tetra.desc[r][c] == 1){
+                breaked = true;
+                break;
+            }
+        }
+        if(breaked){ 
+            break;
+        }
+    }
+    var leftX = (tetra.posX - c * cellSize >= 0);
+
+    return rightX && leftX;
 }
 
 function rotateTetra(tetra){
@@ -118,9 +133,12 @@ function canMoveLeft(tetra){
     for(var r = 0; r < dim; ++r){
         for(var c = 0; c < dim; ++c){
             if(tetra.desc[r][c]){
-                var x = tetra.posX + (c - 1)* cellSize + dsize;
+                var x = tetra.posX + c* cellSize + dsize;
                 var y = tetra.posY + r * cellSize + dsize;
-                context.fillRect(x,y,dsize,dsize);
+                context.fillRect(x - cellSize,y,dsize,dsize); //small dot
+                if(x < 0){
+                    return false;
+                }
                 break;
             }
             else{
@@ -194,7 +212,7 @@ function animateTetra(tetra){
         initialtetra = 
             new Tetra(tetras[rand]);
         clearInterval(timerId);
-        timerId = setInterval(animateTetra,200, initialtetra);
+        timerId = setInterval(animateTetra,400, initialtetra);
     }
 }
 
