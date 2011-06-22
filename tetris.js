@@ -56,7 +56,7 @@ function getRandomInt(min, max)
 
 function canRotate(tetra){
     // find bottom most pixel in tetra and add it to x position
-    for(var r = tetra.size - 1, breaked = false; r >= 0; --r){
+    for(var r = tetra.size - 1, dr = 0, breaked = false; r >= 0; --r, dr++){
         for(var c = 0; c < tetra.size; ++c){
             if(tetra.desc[r][c] == 1){
                 breaked = true;
@@ -67,8 +67,10 @@ function canRotate(tetra){
             break;
         }
     }
-    var rightX = (tetra.posX + r * cellSize < canvas.width);
-
+    var leftX = (tetra.posX + dr * cellSize >= 0);
+    if(tetra.posX < canvas.width /2 && leftX){
+        return true;
+    }
     for(var r = 0, breaked = false; r < tetra.size; ++r){
         for(var c = 0; c < tetra.size; ++c){
             if(tetra.desc[r][c] == 1){
@@ -80,7 +82,7 @@ function canRotate(tetra){
             break;
         }
     }
-    var leftX = (tetra.posX - c * cellSize >= 0);
+    var rightX = (tetra.posX - c * cellSize >= 0);
 
     return rightX && leftX;
 }
