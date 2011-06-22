@@ -54,7 +54,25 @@ function getRandomInt(min, max)
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function canRotate(tetra){
+    // find bottom most pixel in tetra and add it to x position
+    for(var r = tetra.size - 1, breaked = false; r >= 0; --r){
+        for(var c = 0; c < tetra.size; ++c){
+            if(tetra.desc[r][c] == 1){
+                breaked = true;
+                break;
+            }
+        }
+        if(breaked){ 
+            break;
+        }
+    }
+    return (tetra.posX + r * cellSize < canvas.width);
+}
+
 function rotateTetra(tetra){
+    if(!canRotate(tetra))
+        return;
     clearTetra(tetra);
     var dim = tetra.size;
     var ret = new Array(dim);
@@ -75,12 +93,10 @@ function canMoveRight(tetra){
     }
     var dim = tetra.size;
     for(var r = 0; r < dim; ++r){
-        var imgd;
         for(var c = dim - 1; c >= 0; --c){
             if(tetra.desc[r][c]){
                 var x = tetra.posX + (c + 1)* cellSize + dsize;
                 var y = tetra.posY + r * cellSize + dsize;
-                imgd = context.getImageData(x, y, dsize, dsize);
                 context.fillRect(x,y,dsize,dsize);
                 break;
             }
@@ -88,14 +104,8 @@ function canMoveRight(tetra){
                 continue;
             }
         }
-        if(imgd){
-            var pix = imgd.data;
-            for(var i = 0, n = pix.length; i<n;i+=4){
-                if(pix[i] + pix[i+1] + pix[i+2] + pix[i+3]){
-                    return false;
-                }
-            }
-        }
+        if(!isBackGround(c,r))
+            return false;
     }
     return true;
 }
@@ -106,12 +116,10 @@ function canMoveLeft(tetra){
     }
     var dim = tetra.size;
     for(var r = 0; r < dim; ++r){
-        var imgd;
         for(var c = 0; c < dim; ++c){
             if(tetra.desc[r][c]){
                 var x = tetra.posX + (c - 1)* cellSize + dsize;
                 var y = tetra.posY + r * cellSize + dsize;
-                imgd = context.getImageData(x, y, dsize, dsize);
                 context.fillRect(x,y,dsize,dsize);
                 break;
             }
@@ -119,14 +127,8 @@ function canMoveLeft(tetra){
                 continue;
             }
         }
-        if(imgd){
-            var pix = imgd.data;
-            for(var i = 0, n = pix.length; i<n;i+=4){
-                if(pix[i] + pix[i+1] + pix[i+2] + pix[i+3]){
-                    return false;
-                }
-            }
-        }
+        if(!isBackGround(c,r))
+            return false;
     }
     return true;
 }
@@ -235,13 +237,18 @@ function clearFilledLines(tetra) {
         
         //alert("clear line is "+clearLine);
         if (clearLine) {
-            for(var x = 0; x < canvas.width; x += cellSize){
-                for(var _r = y - cellSize; _r >= 0; _r-=cellSize){
-                    if(isBackGround(x,_r)){
-                        context.clearRect(x,_r + cellSize, cellSize, cellSize);
-                        break;
-                    }
-                }
+            dragLines(y);
+        }
+    }
+}
+
+function dragLines(y){
+    for(var x = 0; x < canvas.width; x += cellSize){
+        for(var r = y - cellSize; r >= 0; r-=cellSize){
+            if(isBackGround(x,r)){
+                context.clearRect(x,r + cellSize, cellSize, cellSize);
+            }else{
+                context.fillRect(x, r+cellSize, cellSize, cellSize);
             }
         }
     }
@@ -314,11 +321,13 @@ var initialtetra = new Tetra([
                                  [0,0,0,0]
                              ]);
 
-var timerId = setInterval(animateTetra,200, initialtetra);
+var timerId = setInterval(animateTetra,400, initialtetra);
 
 context.fillStyle = "rgb(0,0,0)";
-context.fillRect(0, canvas.height - 20 * cellSize, canvas.width, cellSize);
-context.fillRect(0, canvas.height - 21 * cellSize, canvas.width, cellSize);
-context.fillRect(0, canvas.height - 22 * cellSize, canvas.width, cellSize);
-context.clearRect(canvas.width / 2, canvas.height - 21 * cellSize, cellSize * 4, cellSize);
-context.clearRect((canvas.width / 2) - 10 * cellSize , canvas.height - 22 * cellSize, cellSize * 4, cellSize);
+for(var i = 20; i < 27; ++i)
+    context.fillRect(0, canvas.height - i * cellSize, canvas.width, cellSize);
+
+context.clearRect(canvas.width / 2, canvas.height - 22 * cellSize, cellSize, cellSize);
+context.clearRect(canvas.width / 2, canvas.height - 26 * cellSize, cellSize, cellSize * 2);
+context.clearRect(0, canvas.height - 26 * cellSize, cellSize, cellSize * 6);
+
