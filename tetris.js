@@ -2,12 +2,13 @@ var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var cellSize = 10;
 var dsize = 2;
+var ticktime = 100;
 
 function Tetra(desc){
     this.size = desc.length;
     this.desc = desc;
     this.posX = canvas.width / 2;
-    this.posY = 0;
+    this.posY = -cellSize;
     this.stopped = false;
 }
 
@@ -190,7 +191,7 @@ function canMoveDown(tetra){
             }
         }
     }
-    alert(maxr + "pos = " + (tetra.posY + maxr * cellSize) + " h = " + canvas.height);
+    //alert(maxr + "pos = " + (tetra.posY + maxr * cellSize) + " h = " + canvas.height);
     return tetra.posY + (maxr + 1)* cellSize < canvas.height;
 }
 
@@ -219,11 +220,11 @@ function animateTetra(tetra){
     else{
         tetra.stopped = true;
         clearFilledLines(tetra);
-        var rand = getRandomInt(6,6);
+        var rand = getRandomInt(0,6);
         initialtetra = 
             new Tetra(tetras[rand]);
         clearInterval(timerId);
-        timerId = setInterval(animateTetra,100, initialtetra);
+        timerId = setInterval(animateTetra, ticktime, initialtetra);
     }
 }
 
@@ -350,4 +351,4 @@ var initialtetra = new Tetra([
                                  [0,0,0,0]
                              ]);
 
-var timerId = setInterval(animateTetra,100, initialtetra);
+var timerId = setInterval(animateTetra, ticktime, initialtetra);
