@@ -160,7 +160,9 @@ function canMoveDown(tetra){
     if(tetra.stopped){ 
         return false;
     }
+
     var dim = tetra.size;
+    var maxr = 0;
     for(var c = 0; c < dim; ++c){
         var imgd;
         for(var r = dim - 1; r >= 0; --r){
@@ -169,6 +171,9 @@ function canMoveDown(tetra){
                 var y = tetra.posY + (r + 1) * cellSize + dsize;
                 imgd = context.getImageData(x, y, dsize, dsize);
                 //context.fillRect(x,y,dsize,dsize);
+                if(r > maxr){
+                    maxr = r;
+                }
                 break;
             }
             else{
@@ -185,7 +190,7 @@ function canMoveDown(tetra){
             }
         }
     }
-    return true;
+    return tetra.posY + maxr * cellSize < canvas.height;
 }
 
 function moveLeft(tetra){
@@ -344,13 +349,6 @@ var initialtetra = new Tetra([
                                  [0,0,0,0]
                              ]);
 
-var timerId = setInterval(animateTetra,400, initialtetra);
+var timerId = setInterval(animateTetra,10, initialtetra);
 
-context.fillStyle = "rgb(0,0,0)";
-for(var i = 20; i < 27; ++i)
-    context.fillRect(0, canvas.height - i * cellSize, canvas.width, cellSize);
-
-context.clearRect(canvas.width / 2, canvas.height - 22 * cellSize, cellSize, cellSize);
-context.clearRect(canvas.width / 2, canvas.height - 26 * cellSize, cellSize, cellSize * 2);
-context.clearRect(0, canvas.height - 26 * cellSize, cellSize, cellSize * 6);
-
+context.fillRect(0,canvas.height - cellSize,  canvas.width, cellSize);
