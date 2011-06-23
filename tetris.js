@@ -45,7 +45,6 @@ function drawTetra(tetra){
         }
 }
 
-
 // Returns a random integer between min and max
 // Using Math.round() will give you a non-uniform distribution!
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Math/random
@@ -106,38 +105,17 @@ function canMoveRight(tetra){
     if (tetra.stopped) { 
         return false;
     }
+
     var dim = tetra.size;
+    var maxc = 0;
     for(var r = 0; r < dim; ++r){
         for(var c = dim - 1; c >= 0; --c){
             if(tetra.desc[r][c]){
-                var x = tetra.posX + (c + 1)* cellSize + dsize;
-                var y = tetra.posY + r * cellSize + dsize;
-                context.fillRect(x,y,dsize,dsize);
-                break;
-            }
-            else{
-                continue;
-            }
-        }
-        if(!isBackGround(c,r))
-            return false;
-    }
-    return true;
-}
-
-function canMoveLeft(tetra){
-    if(tetra.stopped){ 
-        return false;
-    }
-    var dim = tetra.size;
-    for(var r = 0; r < dim; ++r){
-        for(var c = 0; c < dim; ++c){
-            if(tetra.desc[r][c]){
-                var x = tetra.posX + c* cellSize + dsize;
-                var y = tetra.posY + r * cellSize + dsize;
-                context.fillRect(x - cellSize,y,dsize,dsize); //small dot
-                if(x < 0){
-                    return false;
+                //var x = tetra.posX + (c + 1)* cellSize + dsize;
+                //var y = tetra.posY + r * cellSize + dsize;
+                //context.fillRect(x,y,dsize,dsize);
+                if(c > maxc){
+                    maxc = c;
                 }
                 break;
             }
@@ -148,7 +126,34 @@ function canMoveLeft(tetra){
         if(!isBackGround(c,r))
             return false;
     }
-    return true;
+    return (tetra.posX + (maxc + 1)* cellSize < canvas.width);
+}
+
+function canMoveLeft(tetra){
+    if(tetra.stopped){ 
+        return false;
+    }
+    var dim = tetra.size;
+    var minc = dim - 1;
+    for(var r = 0; r < dim; ++r){
+        for(var c = 0; c < dim; ++c){
+            if(tetra.desc[r][c]){
+                if(c < minc){
+                    minc = c;
+                }
+                //var x = tetra.posX + c* cellSize + dsize;
+                //var y = tetra.posY + r * cellSize + dsize;
+                //context.fillRect(x - cellSize,y,dsize,dsize); //small dot
+                break;
+            }
+            else{
+                continue;
+            }
+        }
+        if(!isBackGround(c,r))
+            return false;
+    }
+    return tetra.posX + minc * cellSize > 0;
 }
 
 function canMoveDown(tetra){
@@ -163,7 +168,7 @@ function canMoveDown(tetra){
                 var x = tetra.posX + c * cellSize + dsize;
                 var y = tetra.posY + (r + 1) * cellSize + dsize;
                 imgd = context.getImageData(x, y, dsize, dsize);
-                context.fillRect(x,y,dsize,dsize);
+                //context.fillRect(x,y,dsize,dsize);
                 break;
             }
             else{
