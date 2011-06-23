@@ -218,6 +218,9 @@ function animateTetra(tetra){
         drawTetra(tetra);        
     }
     else{
+        if(tetra.posY === 0){
+            alert("Please try again");
+        }
         tetra.stopped = true;
         clearFilledLines(tetra);
         var rand = getRandomInt(0,6);
