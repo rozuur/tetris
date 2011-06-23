@@ -190,7 +190,8 @@ function canMoveDown(tetra){
             }
         }
     }
-    return tetra.posY + maxr * cellSize < canvas.height;
+    alert(maxr + "pos = " + (tetra.posY + maxr * cellSize) + " h = " + canvas.height);
+    return tetra.posY + (maxr + 1)* cellSize < canvas.height;
 }
 
 function moveLeft(tetra){
@@ -222,7 +223,7 @@ function animateTetra(tetra){
         initialtetra = 
             new Tetra(tetras[rand]);
         clearInterval(timerId);
-        timerId = setInterval(animateTetra,400, initialtetra);
+        timerId = setInterval(animateTetra,100, initialtetra);
     }
 }
 
@@ -349,6 +350,4 @@ var initialtetra = new Tetra([
                                  [0,0,0,0]
                              ]);
 
-var timerId = setInterval(animateTetra,10, initialtetra);
-
-context.fillRect(0,canvas.height - cellSize,  canvas.width, cellSize);
+var timerId = setInterval(animateTetra,100, initialtetra);
