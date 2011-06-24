@@ -2,7 +2,7 @@ var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var cellSize = 10;
 var dsize = 2;
-var ticktime = 100;
+var ticktime = 200;
 
 function Tetra(desc){
     this.size = desc.length;
@@ -124,7 +124,7 @@ function canMoveRight(tetra){
                 continue;
             }
         }
-        if(!isBackGround(c,r))
+        if(!isBackGround(tetra.posX + (c + 1)* cellSize, tetra.posY + r * cellSize))
             return false;
     }
     return (tetra.posX + (maxc + 1)* cellSize < canvas.width);
@@ -151,7 +151,7 @@ function canMoveLeft(tetra){
                 continue;
             }
         }
-        if(!isBackGround(c,r))
+        if(!isBackGround(tetra.posX + (c - 1)* cellSize, tetra.posY + r * cellSize))
             return false;
     }
     return tetra.posX + minc * cellSize > 0;
