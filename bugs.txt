@@ -2,3 +2,5 @@ When pressing right or left before tetra is stopped, it combines with
 neighbour element.
 This is caused due to refactoring code with isBackGround and
 forgetting to pass x,y coordinates.
+
+Gameover is not detecting properly
